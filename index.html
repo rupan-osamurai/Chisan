@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>たたかい！けいさんヒーロー</title>
+<style>
+:root {
+  --main-blue: #4ba2f2;
+  --bg-sky: #cbebff;
+  --panel-bg: #ffffff;
+  --btn-yellow: #ffc227;
+  --btn-yellow-shadow: #e6a300;
+  --text-color: #333333;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial Round MT Bold', 'Hiragino Maru Gothic ProN', 'Yu Gothic', sans-serif;
+  background-color: #aae0ff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: var(--text-color);
+}
+
+.game-container {
+  width: 100%;
+  max-width: 520px;
+  height: 100vh;
+  max-height: 850px;
+  background: linear-gradient(to bottom, #d6f0ff 0%, #edf8ff 60%, #b3e691 60%, #83d156 100%);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ヘッダー・タイトル */
+.header-title {
+  text-align: center;
+  padding: 10px 5px 0;
+  z-index: 5;
+}
+
+.title-logo {
+  font-size: 26px;
+  font-weight: 900;
+  color: #ff5252;
+  text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 0 4px 6px rgba(0,0,0,0.15);
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.sub-title {
+  font-size: 12px;
+  background: #2196f3;
+  color: #fff;
+  padding: 2px 12px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 2px;
+  font-weight: bold;
+}
+
+/* ステージ＆プログレス */
+.top-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  z-index: 5;
+}
+
+.badge {
+  background: #ffffff;
+  border: 2px solid #2196f3;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-weight: bold;
+  font-size: 14px;
+  color: #1976d2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.timer-badge {
+  background: #ffecb3;
+  border-color: #ffa000;
+  color: #e65100;
+}
+
+/* バトルフィールド */
+.battlefield {
+  flex: 1;
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding-bottom: 20px;
+  z-index: 2;
+}
+
+.castle-bg {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 90px;
+  opacity: 0.85;
+}
+
+/* キャラクターイラスト (SVG) */
+.character-box {
+  position: relative;
+  width: 130px;
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+/* アニメーション */
+.hero-attack {
+  animation: heroAttackAnim 0.5s ease;
+}
+
+.monster-hurt {
+  animation: monsterHurtAnim 0.4s ease;
+}
+
+@keyframes heroAttackAnim {
+  0% { transform: translateX(0) scale(1); }
+  50% { transform: translateX(60px) scale(1.15) rotate(5deg); }
+  100% { transform: translateX(0) scale(1); }
+}
+
+@keyframes monsterHurtAnim {
+  0% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(12px) rotate(8deg); filter: brightness(1.3) sepia(0.5) hue-rotate(-50deg); }
+  75% { transform: translateX(-12px) rotate(-8deg); }
+  100% { transform: translateX(0) rotate(0); }
+}
+
+/* パワーゲージ */
+.power-gauge-container {
+  width: 80%;
+  margin: 0 auto 10px;
+  background: #fff;
+  border: 3px solid #333;
+  border-radius: 15px;
+  padding: 3px;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.1);
+  z-index: 5;
+}
+
+.power-gauge-bar {
+  height: 16px;
+  width: 0%;
+  background: linear-gradient(to right, #ffeb3b, #ff9800);
+  border-radius: 10px;
+  transition: width 0.4s ease-out;
+}
+
+.power-label {
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 2px;
+}
+
+/* 問題パネル */
+.quiz-card {
+  background: #ffffff;
+  margin: 0 16px 16px;
+  border-radius: 20px;
+  padding: 16px;
+  border: 4px solid #b2ebf2;
+  box-shadow: 0 6px 0 #80deea, 0 10px 15px rgba(0,0,0,0.1);
+  z-index: 5;
+  text-align: center;
+}
+
+.question-text {
+  font-size: 34px;
+  font-weight: 900;
+  color: #0277bd;
+  margin: 10px 0 15px;
+  letter-spacing: 2px;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.option-btn {
+  background: #f0f8ff;
+  border: 3px solid #81d4fa;
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #01579b;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #4fc3f7;
+  transition: transform 0.1s, background-color 0.1s;
+}
+
+.option-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #4fc3f7;
+}
+
+.option-btn.correct {
+  background: #c8e6c9 !important;
+  border-color: #66bb6a !important;
+  color: #2e7d32 !important;
+  box-shadow: 0 4px 0 #43a047 !important;
+}
+
+.option-btn.wrong {
+  background: #ffcdd2 !important;
+  border-color: #ef5350 !important;
+  color: #c62828 !important;
+  box-shadow: 0 4px 0 #e53935 !important;
+}
+
+/* スタート＆リザルト画面 */
+.overlay-screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.btn-primary {
+  background: var(--btn-yellow);
+  border: 3px solid #fff;
+  outline: 3px solid var(--btn-yellow-shadow);
+  border-radius: 30px;
+  padding: 14px 40px;
+  font-size: 22px;
+  font-weight: 900;
+  color: #5d4037;
+  cursor: pointer;
+  box-shadow: 0 6px 0 var(--btn-yellow-shadow), 0 8px 15px rgba(0,0,0,0.2);
+  margin-top: 20px;
+}
+
+.btn-primary:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 var(--btn-yellow-shadow);
+}
+
+.hidden {
+  display: none !important;
+}
+</style>
+</head>
+<body>
+
+<div class="game-container">
+  
+  <!-- スタート画面 -->
+  <div class="overlay-screen" id="startScreen">
+    <h1 class="title-logo" style="font-size: 34px;">たたかい！<br>けいさんヒーロー</h1>
+    <p style="font-weight: bold; color: #555; margin-top: 15px;">〜 計算でためて、モンスターをやっつけろ！ 〜</p>
+    
+    <!-- ヒーローSVG -->
+    <div style="width: 140px; height: 140px; margin: 20px 0;">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <!-- マント -->
+        <path d="M 25 45 Q 10 50 15 75 Q 35 70 40 55 Z" fill="#ff3b30" stroke="#333" stroke-width="3" stroke-linejoin="round"/>
+        <!-- 体 -->
+        <ellipse cx="45" cy="55" rx="22" ry="20" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <!-- 耳 -->
+        <path d="M 28 32 Q 22 15 36 24 Z" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <path d="M 54 24 Q 68 15 62 32 Z" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <!-- ハチマキ -->
+        <path d="M 25 35 Q 45 30 65 35 L 64 42 Q 45 37 26 42 Z" fill="#ff3b30" stroke="#333" stroke-width="2"/>
+        <circle cx="23" cy="38" r="4" fill="#ff3b30" stroke="#333" stroke-width="2"/>
+        <!-- 顔 -->
+        <circle cx="38" cy="45" r="2.5" fill="#333"/>
+        <circle cx="52" cy="45" r="2.5" fill="#333"/>
+        <ellipse cx="33" cy="49" rx="3" ry="1.5" fill="#ff8a80"/>
+        <ellipse cx="57" cy="49" rx="3" ry="1.5" fill="#ff8a80"/>
+        <path d="M 43 48 Q 45 52 47 48" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+        <!-- 剣 -->
+        <path d="M 60 50 L 80 30 L 85 35 L 65 55 Z" fill="#e0e0e0" stroke="#333" stroke-width="2"/>
+        <path d="M 58 53 L 67 44" stroke="#ffb74d" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <button class="btn-primary" onclick="startGame()">はじめる</button>
+  </div>
+
+  <!-- ゲームメイン画面 -->
+  <div class="header-title">
+    <h1 class="title-logo">たたかい！けいさんヒーロー</h1>
+    <span class="sub-title" id="stageModeLabel">レベル 1 （制限時間なし）</span>
+  </div>
+
+  <div class="top-info">
+    <span class="badge" id="levelLabel">1 / 7 問目</span>
+    <span class="badge timer-badge hidden" id="timerLabel">⏱ 10秒</span>
+  </div>
+
+  <div class="battlefield">
+    <!-- お城背景 -->
+    <svg class="castle-bg" viewBox="0 0 100 100">
+      <rect x="20" y="40" width="60" height="50" fill="#bbdefb" stroke="#333" stroke-width="3"/>
+      <polygon points="15,40 50,10 85,40" fill="#90caf9" stroke="#333" stroke-width="3"/>
+      <rect x="42" y="60" width="16" height="30" fill="#1565c0" rx="8"/>
+    </svg>
+
+    <!-- ヒーロー (左) -->
+    <div class="character-box" id="heroChar">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <!-- マント -->
+        <path d="M 25 45 Q 10 50 15 75 Q 35 70 40 55 Z" fill="#ff3b30" stroke="#333" stroke-width="3"/>
+        <!-- 足 -->
+        <ellipse cx="38" cy="73" rx="5" ry="4" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <ellipse cx="52" cy="73" rx="5" ry="4" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <!-- 体 -->
+        <ellipse cx="45" cy="55" rx="22" ry="20" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <!-- 耳 -->
+        <path d="M 28 32 Q 22 15 36 24 Z" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <path d="M 54 24 Q 68 15 62 32 Z" fill="#ffffff" stroke="#333" stroke-width="3"/>
+        <!-- ハチマキ -->
+        <path d="M 25 35 Q 45 30 65 35 L 64 42 Q 45 37 26 42 Z" fill="#ff3b30" stroke="#333" stroke-width="2"/>
+        <circle cx="22" cy="38" r="4" fill="#ff3b30" stroke="#333" stroke-width="2"/>
+        <!-- 顔 -->
+        <circle cx="38" cy="45" r="2.5" fill="#333"/>
+        <circle cx="52" cy="45" r="2.5" fill="#333"/>
+        <ellipse cx="33" cy="49" rx="3" ry="1.5" fill="#ff8a80"/>
+        <ellipse cx="57" cy="49" rx="3" ry="1.5" fill="#ff8a80"/>
+        <path d="M 43 48 Q 45 52 47 48" fill="none" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+        <!-- 手＆剣 -->
+        <path d="M 60 50 L 82 28 L 87 33 L 65 55 Z" fill="#e0e0e0" stroke="#333" stroke-width="2"/>
+        <path d="M 58 53 L 67 44" stroke="#ffb74d" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="58" cy="53" r="4" fill="#fff" stroke="#333" stroke-width="2"/>
+      </svg>
+    </div>
+
+    <!-- モンスター (右) -->
+    <div class="character-box" id="monsterChar">
+      <svg viewBox="0 0 100 100" width="100%" height="100%">
+        <!-- ツノ -->
+        <path d="M 32 30 Q 20 15 28 10 Q 38 15 36 28 Z" fill="#ffb74d" stroke="#333" stroke-width="3"/>
+        <path d="M 68 30 Q 80 15 72 10 Q 62 15 64 28 Z" fill="#ffb74d" stroke="#333" stroke-width="3"/>
+        <!-- 足 -->
+        <ellipse cx="38" cy="78" rx="6" ry="4" fill="#7e57c2" stroke="#333" stroke-width="3"/>
+        <ellipse cx="62" cy="78" rx="6" ry="4" fill="#7e57c2" stroke="#333" stroke-width="3"/>
+        <!-- 体 -->
+        <ellipse cx="50" cy="55" rx="28" ry="25" fill="#7e57c2" stroke="#333" stroke-width="3"/>
+        <!-- 手 -->
+        <ellipse cx="22" cy="58" rx="5" ry="4" fill="#7e57c2" stroke="#333" stroke-width="3"/>
+        <ellipse cx="78" cy="58" rx="5" ry="4" fill="#7e57c2" stroke="#333" stroke-width="3"/>
+        <!-- 顔 -->
+        <path d="M 36 45 L 44 48" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 64 45 L 56 48" stroke="#333" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="40" cy="50" r="3" fill="#333"/>
+        <circle cx="60" cy="50" r="3" fill="#333"/>
+        <ellipse cx="34" cy="56" rx="4" ry="2" fill="#b388ff"/>
+        <ellipse cx="66" cy="56" rx="4" ry="2" fill="#b388ff"/>
+        <!-- 口 (八重歯) -->
+        <path d="M 45 58 Q 50 63 55 58" fill="none" stroke="#333" stroke-width="2"/>
+        <polygon points="46,58 48,61 50,58" fill="#fff"/>
+        <polygon points="50,58 52,61 54,58" fill="#fff"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- パワーゲージ -->
+  <div class="power-label">パワーゲージ</div>
+  <div class="power-gauge-container">
+    <div class="power-gauge-bar" id="powerBar"></div>
+  </div>
+
+  <!-- 計算問題カード -->
+  <div class="quiz-card">
+    <div style="font-weight: bold; color: #666; font-size: 14px;" id="msgText">もんだいに こたえよう！</div>
+    <div class="question-text" id="questionText">8 + 5 = ?</div>
+    <div class="options-grid" id="optionsGrid">
+      <!-- 選択肢ボタンがJSで入ります -->
+    </div>
+  </div>
+
+  <!-- リザルト画面 -->
+  <div class="overlay-screen hidden" id="resultScreen">
+    <h2 id="resultTitle" style="font-size: 32px; color: #ff5252; margin: 0;">ステージクリア！</h2>
+    <p id="resultDetail" style="font-size: 18px; font-weight: bold; margin: 15px 0;">7問中 6問正解！</p>
+    <button class="btn-primary" id="nextBtn" onclick="nextStage()">つぎのステージへ</button>
+  </div>
+
+</div>
+
+<script>
+let currentLevel = 1;
+let currentQuestion = 1;
+let correctCount = 0;
+let answerVal = 0;
+let isAnswered = false;
+let timer = null;
+let timeLeft = 10;
+
+function startGame() {
+  document.getElementById('startScreen').classList.add('hidden');
+  initStage();
+}
+
+function initStage() {
+  currentQuestion = 1;
+  correctCount = 0;
+  updatePowerBar();
+  
+  const isTimed = currentLevel >= 7;
+  document.getElementById('stageModeLabel').textContent = `レベル ${currentLevel} ${isTimed ? '（制限時間あり）' : '（制限時間なし）'}`;
+  document.getElementById('timerLabel').classList.toggle('hidden', !isTimed);
+  
+  loadQuestion();
+}
+
+function loadQuestion() {
+  isAnswered = false;
+  document.getElementById('levelLabel').textContent = `${currentQuestion} / 7 問目`;
+  document.getElementById('msgText').textContent = 'もんだいに こたえよう！';
+  
+  // 問題作成
+  const maxNum = currentLevel <= 3 ? 10 : 20;
+  const isPlus = Math.random() > 0.4;
+  let a, b;
+
+  if (isPlus) {
+    a = Math.floor(Math.random() * (maxNum - 2)) + 1;
+    b = Math.floor(Math.random() * (maxNum - a)) + 1;
+    answerVal = a + b;
+    document.getElementById('questionText').textContent = `${a} + ${b} = ?`;
+  } else {
+    a = Math.floor(Math.random() * maxNum) + 2;
+    b = Math.floor(Math.random() * (a - 1)) + 1;
+    answerVal = a - b;
+    document.getElementById('questionText').textContent = `${a} - ${b} = ?`;
+  }
+
+  // 選択肢作成
+  let options = new Set([answerVal]);
+  while (options.size < 4) {
+    let dummy = answerVal + (Math.floor(Math.random() * 7) - 3);
+    if (dummy >= 0 && dummy !== answerVal) options.add(dummy);
+  }
+  
+  const optsArray = Array.from(options).sort(() => Math.random() - 0.5);
+  const grid = document.getElementById('optionsGrid');
+  grid.innerHTML = '';
+
+  optsArray.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt, btn);
+    grid.appendChild(btn);
+  });
+
+  // 制限時間セット（レベル7以上）
+  if (currentLevel >= 7) {
+    clearInterval(timer);
+    timeLeft = currentLevel >= 9 ? 7 : 10;
+    updateTimerDisplay();
+    timer = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timer);
+        if (!isAnswered) {
+          handleTimeout();
+        }
+      }
+    }, 1000);
+  }
+}
+
+function updateTimerDisplay() {
+  document.getElementById('timerLabel').textContent = `⏱ ${timeLeft}秒`;
+}
+
+function checkAnswer(selected, btn) {
+  if (isAnswered) return;
+  isAnswered = true;
+  clearInterval(timer);
+
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach(b => b.disabled = true);
+
+  if (selected === answerVal) {
+    correctCount++;
+    btn.classList.add('correct');
+    document.getElementById('msgText').textContent = '✨ せいかい！ パワーがたまった！';
+    
+    // ヒーロー攻撃アニメーション
+    const hero = document.getElementById('heroChar');
+    hero.classList.add('hero-attack');
+    setTimeout(() => hero.classList.remove('hero-attack'), 500);
+
+    const monster = document.getElementById('monsterChar');
+    setTimeout(() => {
+      monster.classList.add('monster-hurt');
+      setTimeout(() => monster.classList.remove('monster-hurt'), 400);
+    }, 200);
+
+    updatePowerBar();
+  } else {
+    btn.classList.add('wrong');
+    document.getElementById('msgText').textContent = `ちがうよ… 正解は ${answerVal}`;
+    buttons.forEach(b => {
+      if (parseInt(b.textContent) === answerVal) b.classList.add('correct');
+    });
+  }
+
+  setTimeout(nextQuestion, 1200);
+}
+
+function handleTimeout() {
+  isAnswered = true;
+  document.getElementById('msgText').textContent = `じかんぎれ！ 正解は ${answerVal}`;
+  const buttons = document.querySelectorAll('.option-btn');
+  buttons.forEach(b => {
+    b.disabled = true;
+    if (parseInt(b.textContent) === answerVal) b.classList.add('correct');
+  });
+  setTimeout(nextQuestion, 1200);
+}
+
+function updatePowerBar() {
+  const pct = Math.round((correctCount / 7) * 100);
+  document.getElementById('powerBar').style.width = pct + '%';
+}
+
+function nextQuestion() {
+  if (currentQuestion < 7) {
+    currentQuestion++;
+    loadQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  const isClear = correctCount >= 6;
+  const screen = document.getElementById('resultScreen');
+  const title = document.getElementById('resultTitle');
+  const detail = document.getElementById('resultDetail');
+  const btn = document.getElementById('nextBtn');
+
+  screen.classList.remove('hidden');
+
+  if (isClear) {
+    title.textContent = currentLevel === 10 ? '🎉 全レベルクリア！' : '⚔️ ステージクリア！';
+    detail.textContent = `7問中 ${correctCount}問正解！\nパワー全開でモンスターをやっつけた！`;
+    btn.textContent = currentLevel === 10 ? 'はじめからあそぶ' : 'つぎのステージへ';
+  } else {
+    title.textContent = '💀 つぎはがんばろう！';
+    title.style.color = '#5c6bc0';
+    detail.textContent = `7問中 ${correctCount}問正解…\n(クリアには 6問以上の正解が必要だよ)`;
+    btn.textContent = 'もう一度チャレンジ';
+  }
+}
+
+function nextStage() {
+  document.getElementById('resultScreen').classList.add('hidden');
+  const isClear = correctCount >= 6;
+
+  if (isClear) {
+    if (currentLevel === 10) {
+      currentLevel = 1;
+    } else {
+      currentLevel++;
+    }
+  }
+  initStage();
+}
+</script>
+</body>
+</html>
