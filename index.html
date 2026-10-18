@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#ffd8ef">
+<title>けいさんヒーロー！</title>
+<style>
+:root{--ink:#493b62;--pink:#ff8fc9;--purple:#8f76e8;--cream:#fff9e9;--mint:#bdf5de;--gold:#ffd86b}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;color:var(--ink);background:#ffe5f3}
+button,input{font:inherit}
+button{touch-action:manipulation;cursor:pointer}
+#app{min-height:100vh;padding:12px;display:flex;justify-content:center;align-items:flex-start;background:radial-gradient(circle at 15% 10%,#fff 0 3px,transparent 4px),radial-gradient(circle at 82% 22%,#fff8b9 0 5px,transparent 6px),linear-gradient(155deg,#ffe2f1,#dff7ff 55%,#fff1cf)}
+.shell{width:100%;max-width:600px;background:rgba(255,255,255,.88);border:3px solid #fff;border-radius:28px;box-shadow:0 8px 0 rgba(128,90,163,.16);padding:15px;overflow:hidden}
+h1{font-size:clamp(25px,7vw,38px);line-height:1.15;text-align:center;margin:4px 0 5px;color:#8554bd;text-shadow:1px 2px #fff}
+.sub{text-align:center;margin:0 0 12px;font-size:13px}
+.topline{display:flex;justify-content:space-between;gap:8px;align-items:center;font-weight:800;font-size:13px;margin:8px 0}
+.pill{background:#fff0a8;border-radius:99px;padding:7px 11px}
+.scene{position:relative;border:3px solid rgba(255,255,255,.9);border-radius:22px;min-height:205px;padding:13px 10px 10px;text-align:center;overflow:hidden;background:linear-gradient(#b8edff,#e5faff 60%,#b4f1cb);transition:background .4s}
+.scene:before,.scene:after{content:"";position:absolute;pointer-events:none;border-radius:50%;background:rgba(255,255,255,.55);width:95px;height:35px;top:24px;left:-18px;box-shadow:28px 8px 0 rgba(255,255,255,.5)}
+.scene:after{left:auto;right:-20px;top:49px;transform:scale(.8)}
+.scene.dark{background:linear-gradient(#24213b,#573f60 60%,#bd4c4c);color:#fff}
+.scene.volcano{background:linear-gradient(#ffbb92,#ffebae 65%,#f39c80)}
+.scene.ocean{background:linear-gradient(#8ce7f3,#d7fbff 65%,#73d6c2)}
+.scene.ice{background:linear-gradient(#a7d8ff,#f4fcff 65%,#b4f5ef)}
+.scene.thunder{background:linear-gradient(#6c77d8,#d6c9ff 65%,#777de4)}
+.scene.castle{background:linear-gradient(#d4b5ff,#ffe1f4 65%,#a8e4d3)}
+.scene h2{position:relative;z-index:1;margin:0 0 2px;font-size:15px}
+.battlefield{position:relative;z-index:1;display:flex;justify-content:space-around;align-items:center;gap:4px;min-height:125px}
+.character{width:46%;display:flex;flex-direction:column;align-items:center;gap:2px}
+.sprite{width:90px;height:88px;max-width:100%;position:relative;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 4px 0 rgba(63,46,87,.12))}
+.hero-body{width:72px;height:64px;background:#fffaf2;border:3px solid #75628d;border-radius:48% 48% 43% 43%;position:relative;box-shadow:inset 0 -5px 0 rgba(235,220,205,.35),-7px 31px 0 -25px #fffaf2,7px 31px 0 -25px #fffaf2}
+.hero-body:before{content:"";position:absolute;width:25px;height:24px;background:#fffaf2;border:3px solid #75628d;border-radius:48% 52% 50% 50%;top:-12px;left:20px;box-shadow:inset 0 -3px 0 rgba(235,220,205,.28)}
+.hero-body:after{content:"";position:absolute;left:23px;bottom:7px;width:22px;height:8px;background:#a8dff0;border:2px solid #75628d;border-radius:8px 8px 10px 10px;transform:rotate(-5deg)}
+.buddy{position:absolute;right:0;bottom:8px;width:29px;height:28px;background:#b9e9f3;border:2px solid #75628d;border-radius:46% 46% 42% 42%;z-index:2;box-shadow:inset 0 -4px 0 rgba(84,174,199,.2)}
+.buddy:before,.buddy:after{content:"";position:absolute;top:-7px;width:9px;height:11px;background:#b9e9f3;border:2px solid #75628d;border-radius:70% 70% 30% 30%;z-index:-1}
+.buddy:before{left:2px;transform:rotate(-12deg)}.buddy:after{right:2px;transform:rotate(12deg)}
+.buddy-eye{position:absolute;top:9px;width:3px;height:4px;background:#493b62;border-radius:50%}.buddy-eye.left{left:6px}.buddy-eye.right{right:6px}
+.buddy-mouth{position:absolute;left:11px;top:16px;width:5px;height:3px;border-bottom:1px solid #493b62;border-radius:50%}
+.ear{position:absolute;top:-12px;width:16px;height:22px;background:#fffaf2;border:3px solid #75628d;border-radius:70% 70% 35% 35%;z-index:-1;box-shadow:inset 0 -5px 0 #ffd9e7}
+.ear.left{left:7px;transform:rotate(-18deg)}.ear.right{right:7px;transform:rotate(18deg)}
+.eye{position:absolute;top:20px;width:5px;height:7px;background:#493b62;border-radius:50%;box-shadow:0 1px 0 rgba(255,255,255,.65)}
+.eye.left{left:15px}.eye.right{right:15px}
+.cheek{position:absolute;top:31px;width:13px;height:7px;border-radius:50%;background:#ff9bc7;opacity:.95}
+.cheek.left{left:6px}.cheek.right{right:6px}
+.mouth{position:absolute;top:31px;left:28px;width:8px;height:5px;border-bottom:2px solid #493b62;border-radius:50%}
+.cape{position:absolute;left:4px;top:31px;width:28px;height:39px;background:#ff8fc9;border-radius:8px 7px 14px 12px;transform:rotate(7deg);z-index:-1;border:2px solid #75628d}.cape:after{content:"";position:absolute;left:8px;top:7px;width:6px;height:6px;background:#fff4b8;border:1px solid #75628d;border-radius:50%}
+.monster-body{width:73px;height:64px;border:3px solid #5b4979;border-radius:47% 47% 38% 38%;background:#ad8af3;position:relative}
+.monster-body:before,.monster-body:after{content:"";position:absolute;top:-15px;width:21px;height:25px;background:inherit;border:3px solid #5b4979;border-radius:80% 15% 60% 20%;z-index:-1}
+.monster-body:before{left:5px;transform:rotate(-25deg)}.monster-body:after{right:5px;transform:rotate(25deg) scaleX(-1)}
+.monster-body .eye{top:23px;width:8px;height:9px;background:#fff;border:2px solid #5b4979}
+.monster-body .eye:after{content:"";display:block;width:3px;height:4px;background:#493b62;border-radius:50%;margin:1px}
+.monster-body .mouth{top:39px;left:30px;border:0;background:#493b62;width:12px;height:7px;border-radius:3px 3px 8px 8px}
+.monster-body.fire{background:#ff946c}.monster-body.water{background:#69d6e8}.monster-body.ice{background:#d4f8ff}.monster-body.thunder{background:#ffdf66}.monster-body.darkboss{background:#4b3d51;border-color:#201c2a}
+.monster-body.darkboss:before,.monster-body.darkboss:after{border-color:#201c2a}
+.charname{font-size:12px;font-weight:900;background:rgba(255,255,255,.78);padding:4px 9px;border-radius:99px;max-width:100%}
+.vs{font-size:18px;font-weight:1000;color:#ff659f;text-shadow:1px 2px white;position:absolute;left:50%;top:48%;transform:translate(-50%,-50%) rotate(-12deg)}
+.energylabel{font-size:12px;font-weight:800;margin:10px 0 4px}
+.gauge{height:15px;background:#eee0f8;border:2px solid white;border-radius:99px;overflow:hidden}
+.gaugefill{height:100%;width:0%;background:linear-gradient(90deg,#ff83c7,#ffdb65,#7be8c0);border-radius:99px;transition:width .35s}
+.questionbox{margin:13px 0 10px;padding:14px 10px;background:#fff8e9;border:3px dashed #ffd17b;border-radius:20px;text-align:center}
+.qnumber{font-size:12px;color:#997aaf;font-weight:800}
+.question{font-size:clamp(32px,10vw,47px);font-weight:1000;letter-spacing:1px;margin:4px 0 0;color:#4e3c72}
+.timer{font-size:13px;font-weight:900;color:#e94d8d;min-height:20px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.answer{min-height:58px;border:0;border-radius:16px;background:#fff;border-bottom:5px solid #d7c6ed;color:#5a4775;font-weight:1000;font-size:25px;box-shadow:0 2px 0 rgba(88,62,124,.08)}
+.answer:active,.mainbtn:active{transform:translateY(2px);border-bottom-width:3px}
+.answer.correct{background:#b9f5d9;border-bottom-color:#63cba1}
+.answer.wrong{background:#ffd0df;border-bottom-color:#ed8aa8}
+.entryrow{display:flex;gap:8px;margin-top:10px}
+#answerInput{width:100%;min-width:0;text-align:center;font-size:30px;font-weight:900;border:3px solid #d7c6ed;border-radius:15px;background:#fff;padding:8px;color:#493b62}
+.mainbtn{border:0;border-radius:15px;background:#8b68df;color:white;font-weight:900;padding:13px 16px;box-shadow:0 4px 0 #6549b1;white-space:nowrap}
+.mainbtn:disabled{opacity:.45}
+.feedback{min-height:31px;text-align:center;font-weight:900;font-size:15px;padding:7px 2px}
+.smallnote{text-align:center;color:#8b7a9f;font-size:11px;margin-top:8px}
+.hidden{display:none!important}
+.overlay{position:fixed;inset:0;background:rgba(42,30,63,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5}
+.modal{background:#fffaf0;border:4px solid white;border-radius:28px;padding:23px 17px;max-width:400px;width:100%;text-align:center;box-shadow:0 10px 0 rgba(30,20,45,.2)}
+.modal h2{font-size:27px;margin:5px 0}.modal p{line-height:1.7}
+.mascot-mark{width:48px;height:42px;margin:0 auto 8px;position:relative;background:#fffaf2;border:3px solid #75628d;border-radius:48% 48% 43% 43%;box-shadow:inset 0 -4px 0 #f0e4d8}.mascot-mark:before,.mascot-mark:after{content:"";position:absolute;top:-12px;width:13px;height:19px;background:#fffaf2;border:3px solid #75628d;border-radius:70% 70% 35% 35%;z-index:-1}.mascot-mark:before{left:4px;transform:rotate(-12deg)}.mascot-mark:after{right:4px;transform:rotate(12deg)}.mascot-mark span{position:absolute;left:11px;top:14px;width:4px;height:5px;border-radius:50%;background:#493b62;box-shadow:15px 0 #493b62}.mascot-mark span:after{content:"";position:absolute;top:8px;left:5px;width:6px;height:3px;border-bottom:2px solid #493b62;border-radius:50%}
+.mainbtn.pink{background:#ff7fba;box-shadow:0 4px 0 #d64f91}
+.mainbtn.gold{background:#f0b73e;box-shadow:0 4px 0 #b78019;color:#4b355c}
+.flash{animation:flash .45s ease}
+.shake{animation:shake .4s ease}
+@keyframes flash{0%{filter:brightness(1)}35%{filter:brightness(1.8)}100%{filter:brightness(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@media(min-width:500px){#app{padding:22px}.shell{padding:20px}.scene{min-height:225px}.sprite{transform:scale(1.1)}}
+</style>
+</head>
+<body>
+<div id="app">
+ <main class="shell">
+ <h1>けいさんヒーロー！</h1>
+ <p class="sub">7もん といて、ボスを たおそう！</p>
+ <div class="topline"><span class="pill" id="levelPill">レベル 1 / 10</span><span class="pill" id="scorePill">せいかい 0 / 7</span></div>
+ <section class="scene" id="scene">
+  <h2 id="stageName">レベル1：おかしのもり</h2>
+  <div class="battlefield">
+  <div class="character"><div class="sprite" id="heroSprite"><div class="cape"></div><div class="buddy" aria-hidden="true"><i class="buddy-eye left"></i><i class="buddy-eye right"></i><i class="buddy-mouth"></i></div><div class="hero-body"><i class="ear left"></i><i class="ear right"></i><i class="eye left"></i><i class="eye right"></i><i class="cheek left"></i><i class="cheek right"></i><i class="mouth"></i></div></div><div class="charname">まるもちヒーロー</div></div>
+  <div class="vs">たいけつ</div>
+  <div class="character"><div class="sprite"><div class="monster-body" id="monsterBody"><i class="eye left"></i><i class="eye right"></i><i class="mouth"></i></div></div><div class="charname" id="monsterName">ぷにぷにスライム</div></div>
+  </div>
+ </section>
+ <div class="energylabel"> ヒーローのパワー <span id="energyText">0 / 7</span></div>
+ <div class="gauge"><div class="gaugefill" id="gaugeFill"></div></div>
+ <section class="questionbox">
+  <div class="qnumber" id="qNumber">だい1もん</div>
+  <div class="question" id="question">8 + 7 = ?</div>
+  <div class="timer" id="timer"></div>
+ </section>
+ <div id="choiceArea" class="answers"></div>
+ <form id="entryForm" class="entryrow hidden">
+  <input id="answerInput" type="text" inputmode="numeric" pattern="[0-9０-９]*" maxlength="2" placeholder="こたえ" autocomplete="off" aria-label="こたえをいれてね">
+  <button class="mainbtn" type="submit" id="submitBtn">これでいいよ！</button>
+ </form>
+ <div class="feedback" id="feedback" aria-live="polite">こたえを えらんでね！</div>
+ <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+  <button class="mainbtn pink" id="restartBtn" type="button">このレベルを もういちど</button>
+  <button class="mainbtn gold hidden" id="nextBtn" type="button">つぎのレベルへ</button>
+ </div>
+ <p class="smallnote">まちがえても だいじょうぶ！ なんどでも やってみよう。</p>
+ </main>
+</div>
+<div class="overlay" id="modalOverlay">
+ <div class="modal">
+ <div class="mascot-mark" aria-hidden="true"><span></span></div>
+ <h2>ぼうけん スタート！</h2>
+ <p>たしざんで パワーをためて、10たいのボスに ちょうせん！<br>6もん せいかいで クリアだよ。</p>
+ <button class="mainbtn pink" id="startBtn">ゲーム スタート！</button>
+ </div>
+</div>
+<script>
+(()=>{
+const stages=[
+ {name:"おかしのもり",monster:"ぷにぷにスライム",kind:"cute",bg:""},
+ {name:"ほしぞらのくに",monster:"きらきらゴースト",kind:"cute",bg:""},
+ {name:"キャンディじょう",monster:"キャンディドラゴン",kind:"cute",bg:"castle"},
+ {name:"もえもえ火山",monster:"ファイアゴーレム",kind:"fire",bg:"volcano"},
+ {name:"きらめく うみ",monster:"うみのまもの",kind:"water",bg:"ocean"},
+ {name:"こおりのせかい",monster:"アイスモンスター",kind:"ice",bg:"ice"},
+ {name:"かみなりの山",monster:"サンダービースト",kind:"thunder",bg:"thunder"},
+ {name:"やみの戦士",monster:"やみの ぶじん",kind:"darkboss",bg:"dark"},
+ {name:"まおうの城",monster:"まおうデストラ",kind:"darkboss",bg:"dark"},
+ {name:"さいしゅうけっせん",monster:"おおまおう ごうらい",kind:"darkboss",bg:"dark"}
+];
+let level=1,qIndex=0,correct=0,questions=[],locked=false,timerId=null,seconds=12,started=false;
+const $=id=>document.getElementById(id);
+function rand(n){return Math.floor(Math.random()*n)}
+function makeQuestion(){
+ let a,b;
+ if(Math.random()<.52){
+  a=1+rand(9); b=10-a+1+rand(Math.max(1,Math.min(10,20-a-(10-a+1)+1)));
+  if(a+b>20)b=20-a;
+  if(a+b<10)b=10-a;
+ }else{
+  a=rand(11); b=rand(21-a);
+  if((a%10)+(b%10)>=10){b=Math.max(0,9-(a%10));}
+ }
+ return {a,b,answer:a+b};
+}
+function makeSet(){
+ questions=[];
+ for(let i=0;i<7;i++){
+ let q=makeQuestion(),tries=0;
+ while(questions.some(x=>x.a===q.a&&x.b===q.b)&&tries++<20)q=makeQuestion();
+ questions.push(q);
+ }
+}
+function isTimed(){return level>=8}
+function isChoice(){return level<=3}
+function renderStage(){
+ const s=stages[level-1];
+ $("levelPill").textContent=`レベル ${level} / 10`;
+ $("scorePill").textContent=`せいかい ${correct} / 7`;
+ $("stageName").textContent=`レベル${level}：${s.name}`;
+ $("monsterName").textContent=s.monster;
+ $("scene").className="scene "+s.bg;
+ $("monsterBody").className="monster-body "+s.kind;
+ $("energyText").textContent=`${correct} / 7`;
+ $("gaugeFill").style.width=(correct/7*100)+"%";
+ $("nextBtn").classList.add("hidden");
+ $("restartBtn").classList.remove("hidden");
+}
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null}}
+function startTimer(){
+ stopTimer();
+ if(!isTimed()){$("timer").textContent="";return}
+ seconds=12;$("timer").textContent=` のこり ${seconds}びょう`;
+ timerId=setInterval(()=>{
+ seconds--;$("timer").textContent=` のこり ${seconds}びょう`;
+ if(seconds<=0){stopTimer();answerQuestion(null,true)}
+ },1000);
+}
+function showQuestion(){
+ locked=false;
+ const q=questions[qIndex];
+ $("qNumber").textContent=`だい${qIndex+1}もん / 7もん`;
+ $("question").textContent=`${q.a} + ${q.b} = ?`;
+ $("feedback").textContent=isTimed()?"12びょういないに こたえよう！":"こたえを えらんでね！";
+ $("choiceArea").innerHTML="";
+ $("entryForm").classList.toggle("hidden",isChoice());
+ $("choiceArea").classList.toggle("hidden",!isChoice());
+ $("answerInput").value="";
+ $("submitBtn").disabled=false;
+ if(isChoice()){
+ let opts=new Set([q.answer]);
+ while(opts.size<4){
+  let delta=1+rand(7),v=Math.random()<.5?q.answer+delta:q.answer-delta;
+  if(v>=0&&v<=20)opts.add(v);
+ }
+ [...opts].sort(()=>Math.random()-.5).forEach(v=>{
+  const btn=document.createElement("button");btn.type="button";btn.className="answer";btn.textContent=v;
+  btn.addEventListener("click",()=>answerQuestion(v,false,btn));$("choiceArea").appendChild(btn);
+ });
+ }
+ startTimer();
+}
+function answerQuestion(value,timedOut=false,button=null){
+ if(locked)return;locked=true;stopTimer();
+ const q=questions[qIndex],ok=value===q.answer&&!timedOut;
+ [...$("choiceArea").querySelectorAll("button")].forEach(b=>{b.disabled=true;if(Number(b.textContent)===q.answer)b.classList.add("correct")});
+ if(button&&!ok)button.classList.add("wrong");
+ if(ok){
+ correct++;$("feedback").textContent=["せいかい！ パワーアップ！ ","すごい！ そのちょうし！ ","やったね！ ヒーローが つよくなった！ "][rand(3)];
+ $("scene").classList.remove("shake");void $("scene").offsetWidth;$("scene").classList.add("flash");
+ }else{
+ $("feedback").textContent=timedOut?`じかんぎれ！ こたえは ${q.answer} だよ`:`おしい！ こたえは ${q.answer} だよ`;
+ $("scene").classList.remove("flash");void $("scene").offsetWidth;$("scene").classList.add("shake");
+ }
+ $("scorePill").textContent=`せいかい ${correct} / 7`;
+ $("energyText").textContent=`${correct} / 7`;
+ $("gaugeFill").style.width=(correct/7*100)+"%";
+ $("submitBtn").disabled=true;
+ setTimeout(()=>{
+ qIndex++;
+ if(qIndex>=7)finishLevel();else showQuestion();
+ },850);
+}
+function finishLevel(){
+ stopTimer();locked=true;
+ $("choiceArea").classList.add("hidden");$("entryForm").classList.add("hidden");$("timer").textContent="";
+ $("qNumber").textContent="7もん おわり！";
+ $("question").textContent=correct>=6?"ひっさつわざ！！":"もういちど！";
+ $("scene").classList.add("flash");
+ if(correct>=6){
+ $("feedback").textContent=" ヒーローの こうげき！ ボスを たおした！";
+ $("monsterBody").style.transform="rotate(25deg) scale(.65)";
+ $("monsterBody").style.opacity=".25";
+ $("heroSprite").style.transform="scale(1.35) rotate(-8deg)";
+ $("restartBtn").classList.add("hidden");
+ if(level<10){$("nextBtn").classList.remove("hidden");$("nextBtn").textContent="つぎのレベルへ"}
+ else{
+  $("nextBtn").classList.remove("hidden");$("nextBtn").textContent="さいごのおはなし ";
+ }
+ }else{
+ $("feedback").textContent=`${correct}もん せいかい！ あと${6-correct}もんで クリア。もういちど やってみよう！`;
+ $("restartBtn").classList.remove("hidden");$("nextBtn").classList.add("hidden");
+ }
+}
+function beginLevel(){
+ qIndex=0;correct=0;locked=false;
+ $("monsterBody").style.transform="";$("monsterBody").style.opacity="1";$("heroSprite").style.transform="";
+ makeSet();renderStage();showQuestion();
+}
+$("entryForm").addEventListener("submit",e=>{
+ e.preventDefault();
+ const raw=$("answerInput").value.trim();
+ if(raw===""){$("feedback").textContent="こたえを いれてね！";return}
+ const normalized=raw.replace(/[０-９]/g,ch=>String.fromCharCode(ch.charCodeAt(0)-0xFEE0));
+ if(!/^[0-9]{1,2}$/.test(normalized) || Number(normalized)>20){
+ $("feedback").textContent="0から20までの すうじを いれてね！";return;
+ }
+ answerQuestion(Number(normalized));
+});
+$("startBtn").addEventListener("click",()=>{$("modalOverlay").classList.add("hidden");started=true;beginLevel()});
+$("restartBtn").addEventListener("click",beginLevel);
+$("nextBtn").addEventListener("click",()=>{
+ if(level>=10){
+ $("modalOverlay").innerHTML='<div class="modal"><div class="mascot-mark" aria-hidden="true"><span></span></div><h2>ぜんぶ クリア！</h2><p>きみは さいこうの けいさんヒーロー！<br>たしざんパワー ぜんかい！</p><button class="mainbtn pink" id="againAll">さいしょから あそぶ</button></div>';
+ $("modalOverlay").classList.remove("hidden");$("againAll").addEventListener("click",()=>{level=1;$("modalOverlay").classList.add("hidden");beginLevel()});
+ }else{level++;beginLevel()}
+});
+})();
+</script>
+</body>
+</html>
